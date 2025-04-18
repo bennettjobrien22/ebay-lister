@@ -4,22 +4,26 @@ import csv
 import sys
 from unittest.mock import patch, mock_open
 
-# Add the parent directory to the path so we can import the main module
+# Add the parent directory to the path so we can import the module
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import main
+from src.csv_processor import read_csv_file, process_csv
 
-class TestMain(unittest.TestCase):
-    """Test cases for the main module."""
+class TestCSVProcessor(unittest.TestCase):
+    """Test cases for the CSV processor module."""
     
-    def test_csv_file_exists(self):
-        """Test that the CSV file exists."""
-        self.assertTrue(os.path.exists(main.csv_file), f"CSV file {main.csv_file} does not exist")
-    
+    @patch('os.path.exists', return_value=False)
+    def test_read_csv_file_file_not_found(self, mock_exists):
+        """Test that read_csv_file handles FileNotFoundError correctly."""
+        with self.assertRaises(FileNotFoundError):
+            read_csv_file("nonexistent.csv")
+
+
+    @patch('os.path.exists', return_value=True)
     @patch('builtins.open', new_callable=mock_open, read_data="header1,header2\nvalue1,value2\nvalue3,value4")
-    def test_read_csv_file(self, mock_file):
+    def test_read_csv_file(self, mock_file, mock_exists):
         """Test that the read_csv_file function works correctly."""
         # Call the function with a mock file
-        result = main.read_csv_file("dummy.csv")
+        result = read_csv_file("dummy.csv")
         
         # Check that the file was opened with the correct path
         mock_file.assert_called_once_with("dummy.csv")
@@ -28,23 +32,25 @@ class TestMain(unittest.TestCase):
         expected = [["header1", "header2"], ["value1", "value2"], ["value3", "value4"]]
         self.assertEqual(result, expected)
     
-    @patch('main.read_csv_file')
+
+    @patch('src.csv_processor.read_csv_file')
     @patch('builtins.print')
-    def test_main_function(self, mock_print, mock_read_csv):
-        """Test that the main function works correctly."""
+    def test_process_csv(self, mock_print, mock_read_csv):
+        """Test that the process_csv function works correctly."""
         # Set up the mock to return some data
         mock_read_csv.return_value = [["header1", "header2"], ["value1", "value2"]]
         
-        # Call the main function
-        main.main()
+        # Call the process_csv function
+        process_csv("dummy.csv")
         
         # Check that read_csv_file was called with the correct path
-        mock_read_csv.assert_called_once_with(main.csv_file)
+        mock_read_csv.assert_called_once_with("dummy.csv")
         
         # Check that print was called for each row
         self.assertEqual(mock_print.call_count, 2)
         mock_print.assert_any_call(["header1", "header2"])
         mock_print.assert_any_call(["value1", "value2"])
+
 
 if __name__ == '__main__':
     unittest.main() 
