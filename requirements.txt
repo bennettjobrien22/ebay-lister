@@ -1,0 +1,6 @@
+# Core dependencies
+# No external dependencies required for the basic functionality
+
+# Testing dependencies
+pytest==7.4.0
+pytest-cov==4.1.0 
