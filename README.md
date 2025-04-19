@@ -8,18 +8,18 @@ Meant to take csv files as input
 
 ```
 ebay-lister/
+├── data/
+│   └── basketball-cards.csv
 ├── src/                  # Source code
 │   ├── __init__.py       # Package initialization
 │   └── csv_processor.py  # CSV processing functionality
 ├── tests/                # Test suite
 │   └── test_csv_processor.py
-├── data.csv              # Sample data
-├── main.py              # Entry point
-├── run_tests.py          # Test runner
-├── run_mutation_tests.py # Mutation testing runner
+├── main.py               # Entry point
 ├── pytest.ini            # Pytest configuration
-├── setup.cfg             # Mutmut configuration
 └── requirements.txt      # Dependencies
+├── run_mutation_tests.py # Mutation testing runner
+├── setup.cfg             # Mutmut configuration
 ```
 
 ## Usage
