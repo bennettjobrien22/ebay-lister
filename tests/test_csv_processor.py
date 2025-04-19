@@ -34,22 +34,39 @@ class TestCSVProcessor(unittest.TestCase):
     
 
     @patch('src.csv_processor.read_csv_file')
-    @patch('builtins.print')
-    def test_process_csv(self, mock_print, mock_read_csv):
+    def test_process_csv_simple(self, mock_read_csv):
         """Test that the process_csv function works correctly."""
-        # Set up the mock to return some data
-        mock_read_csv.return_value = [["header1", "header2"], ["value1", "value2"]]
+        mock_read_csv.return_value = [
+            ["Michael Jordan Rookie", "$20,000"],
+            ["Michael Jordan Skybox", "$10,000"],
+        ]
         
-        # Call the process_csv function
-        process_csv("dummy.csv")
+        summary = process_csv("dummy.csv")
         
-        # Check that read_csv_file was called with the correct path
         mock_read_csv.assert_called_once_with("dummy.csv")
         
-        # Check that print was called for each row
-        self.assertEqual(mock_print.call_count, 2)
-        mock_print.assert_any_call(["header1", "header2"])
-        mock_print.assert_any_call(["value1", "value2"])
+        self.assertEqual(summary["total_cards"], 2)
+        self.assertEqual(summary["unique_cards"], 2)
+        self.assertEqual(summary["total_value"], 30000)
+
+
+    @patch('src.csv_processor.read_csv_file')
+    def test_process_csv_duplicates(self, mock_read_csv):
+        """Test that the process_csv function works correctly with duplicates."""
+        mock_read_csv.return_value = [
+            ["Michael Jordan 97", "$20,000"],
+            ["Michael Jordan 98", "$10,000"],
+            ["Michael Jordan 96", "$15,000"],
+            ["Michael Jordan 96", "$15,000"],
+        ]
+        
+        summary = process_csv("dummy.csv")
+        
+        mock_read_csv.assert_called_once_with("dummy.csv")
+
+        self.assertEqual(summary["total_cards"], 4)
+        self.assertEqual(summary["unique_cards"], 3)
+        self.assertEqual(summary["total_value"], 60000)
 
 
 if __name__ == '__main__':
